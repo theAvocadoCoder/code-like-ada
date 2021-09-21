@@ -1,109 +1,185 @@
 <template>
   <div
     class="
+      component-container
       flex flex-col flex-none
       items-center
       justify-center
       align-self-center
       justify-self-center
-      w-80
+      bg-gray-50
+      w-9/12
+      md:w-2/3
+      lg:w-5/8
       rounded
       border border-solid border-gray-200
       p-5
+      mx-auto
+      mt-10
     "
   >
-    <template v-if="regStatus">
-      <template v-if="regError">
-        <div>
-          <span>
-            This email has already been registered. No need to re-register.
-            <button @click.prevent="closeBox()">Close</button>
-          </span>
-        </div>
-      </template>
-      <template v-else>
-        <div>
-          <span>
-            You have successfully submitted your registration form. You will
-            receive an email on or before the 3rd if you have been selected for
-            the interviewing process.
-          </span>
-          <button @click.prevent="closeBox()">Close</button>
-        </div>
-      </template>
+    <template v-if="regError == true">
+      <div
+        class="
+          m-auto
+          bg-transparent
+          border border-double border-green-100
+          rounded
+          justify-center
+          p-10
+        "
+      >
+        <span>
+          We have already received an application with this email address. We
+          will get back to you within 72 hours of your submission.
+        </span>
+        <br />
+        <button
+          class="p-4 w-full mx-auto mt-10 bg-green-200 rounded-md border-none"
+          @click.prevent="closeBox()"
+        >
+          Close
+        </button>
+      </div>
+    </template>
+    <template v-else-if="regStatus == true">
+      <div
+        class="
+          m-auto
+          bg-transparent
+          border border-double border-green-100
+          rounded
+          justify-center
+          p-10
+        "
+      >
+        <span>
+          You have successfully submitted your application form! Your
+          application will be reviewed and you will receive an email with
+          further details within 72 hours.
+        </span>
+        <br />
+        <button
+          class="p-4 w-full mx-auto mt-10 bg-green-200 rounded-md border-none"
+          @click.prevent="closeBox()"
+        >
+          Close
+        </button>
+      </div>
+    </template>
+    <template v-else-if="errMessage">
+      <div
+        class="
+          m-auto
+          bg-transparent
+          border border-double border-green-100
+          rounded
+          justify-center
+          p-10
+        "
+      >
+        <span> { errMessage } </span>
+        <br />
+        <button
+          class="p-5 w-full mx-auto mt-10 bg-green-200 rounded-md border-none"
+          @click.prevent="closeBox()"
+        >
+          Close
+        </button>
+      </div>
     </template>
     <template v-else>
-      <h1 class="text-4xl font-medium mb-5">Kindly Register For The Event</h1>
+      <h1 class="text-xl font-medium mb-5">Kindly Register for the Program</h1>
 
-      <form @submit.prevent>
-        <label class="mb-1">First Name</label>
+      <form @submit.prevent="submitForm()">
+        <label class="mb-1">First Name:</label>
+        <br />
         <input
           required
           class="
             h-8
-            mb-2
+            mb-3
             bg-white
-            border-2 border-double border-gray-400
+            border-2 border-double border-green-100
+            rounded-lg
             w-full
           "
           type="text"
           v-model.trim="form.firstName"
         />
 
-        <label class="mb-1">Last Name</label>
+        <br />
+
+        <label class="mb-1">Last Name:</label>
+        <br />
         <input
           required
           class="
             h-8
-            mb-2
+            mb-3
             bg-white
-            border-2 border-double border-gray-400
+            border-2 border-double border-green-100
+            rounded-lg
             w-full
           "
           type="text"
           v-model.trim="form.lastName"
         />
 
-        <label class="mb-1">Email</label>
+        <br />
+
+        <label class="mb-1">Email:</label>
+        <br />
         <input
           required
           class="
             h-8
-            mb-2
+            mb-3
             bg-white
-            border-2 border-double border-gray-400
+            border-2 border-double border-green-100
+            rounded-lg
             w-full
           "
           type="text"
           v-model.trim="form.email"
         />
 
-        <label class="mb-1">Statement of Purpose</label>
-        <input
+        <br />
+
+        <label class="mb-1">Statement of Purpose:</label>
+        <br />
+        <small class="text-xs">
+          (In no more than 250 words, introduce yourself, detailing what you
+          intend to benefit from the program as well as why you should be
+          selected)
+        </small>
+        <br />
+        <textarea
           required
           class="
-            h-8
-            mb-2
+            h-16
+            mb-3
             bg-white
-            border-2 border-double border-gray-400
+            border-2 border-double border-green-100
+            rounded-lg
             w-full
           "
           type="text"
           v-model.trim="form.intent"
         />
 
+        <br />
+
         <button
           class="
-            register__signUpButton
-            bg-yellow-button
-            rounded-sm
+            bg-green-300
+            rounded-lg
             w-full
             h-8
-            border border-solid
+            border border-solid border-green-400
             mt-3
-            border-yellow-border
           "
-          @click="submitForm()"
+          type="submit"
         >
           Submit
         </button>
@@ -111,6 +187,12 @@
     </template>
   </div>
 </template>
+
+<style>
+.component-container {
+  font-family: "Skyhook Mono", "Courier New", Courier, monospace;
+}
+</style>
 
 <script>
 import { mapGetters } from "vuex";
@@ -134,20 +216,19 @@ export default {
         email: this.form.email,
         intent: this.form.intent,
       });
-      for (let field in this.form) {
-        if (field === "" || field !== "") {
-          field = "";
-        }
-      }
-      this.$store.dispatch("setRegStatus", true);
     },
     closeBox: function () {
       this.$store.dispatch("setRegStatus", false);
-      this.$store.dispatch("SetRegError", false);
+      this.$store.dispatch("setRegError", false);
+      this.$store.dispatch("setErrMessage", "");
+      this.form.firstName = "";
+      this.form.lastName = "";
+      this.form.email = "";
+      this.form.intent = "";
     },
   },
   computed: {
-    ...mapGetters(["regStatus", "regError"]),
+    ...mapGetters(["regStatus", "regError", "errMessage"]),
   },
 };
 </script>

@@ -18,15 +18,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+const app = initializeApp(firebaseConfig, "code-like-ada");
 const analytics = getAnalytics(app);
-const app = initializeApp(firebaseConfig);
-const applicantsCollection = db.collection("applicants");
 const db = getFirestore(app);
+const applicantsCollection = db.collection("applicants");
 
 
 export {
-    analytics,
     app,
-    applicantsCollection,
+    analytics,
     db,
+    applicantsCollection,
 }
